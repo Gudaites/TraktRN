@@ -1,0 +1,6 @@
+module Pods_WebJumpChallenge {
+  umbrella header "Pods-WebJumpChallenge-umbrella.h"
+
+  export *
+  module * { export * }
+}
