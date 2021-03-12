@@ -34,11 +34,14 @@ export const Border = styled(FastImage)`
 export const InfoView = styled.View`
   flex: 1;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
 `;
 
 export const Title = styled.Text`
   color: white;
   font-size: 18px;
+  margin-bottom: 10px;
 `;
 
 export const Year = styled.Text`

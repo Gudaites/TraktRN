@@ -11,8 +11,8 @@ import {
   Year,
 } from './styles';
 
-const Card = ({index, item}) => {
-  const poster = item.movieposter?.url;
+export const Card = ({ index, item }) => {
+  const poster = item.movieposter ? item.movieposter.url : undefined;
   return (
     <Container key={index}>
       <CardContent>
@@ -29,6 +29,7 @@ const Card = ({index, item}) => {
         />
       </CardContent>
       <InfoView>
+        <Title>Top {index + 1}º</Title>
         <Title>{item.title}</Title>
         <Year>{item.year}</Year>
       </InfoView>

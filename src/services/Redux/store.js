@@ -4,21 +4,21 @@ function setTrending(movies, page) {
     payload: new Promise(movies),
     page: new Promise(page),
   };
-  console.log(action);
   return action;
 }
 
-function setWatched(movies) {
+function setWatched(movies, page) {
   const action = {
-    type: 'SET_WATCHED',
+    type: 'SET_POPULAR',
     payload: new Promise(movies),
+    page: new Promise(page),
   };
   return action;
 }
 
-function setBoxOffice(movies) {
+function setFilter(movies) {
   const action = {
-    type: 'SET_BOXOFFICE',
+    type: 'SET_FILTER',
     payload: new Promise(movies),
   };
   return action;
@@ -44,7 +44,7 @@ function setMovies(movies, type) {
   switch (type) {
     case 'trending':
       return setTrending(movies);
-    case 'watched':
+    case 'popular':
       return setWatched(movies);
     case 'boxoffice':
       return setBoxOffice(movies);
@@ -55,4 +55,4 @@ function setMovies(movies, type) {
   }
 }
 
-export {setMovies, setIsLoading};
+export { setMovies, setIsLoading };

@@ -1,31 +1,30 @@
-import React, {useEffect, useState, useCallback} from 'react';
+import React, { useEffect, useCallback } from 'react';
 
 // React Redux
-import {useSelector, useDispatch} from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
-import {api, apiFanart} from '../../services/api';
-import {SafeAreaView, FlatList, ViewLoad, IconLoad} from './styles';
-import Card from '../Components/Card';
+import { api, apiFanart } from '../../services/api';
+import { SafeAreaView, FlatList, ViewLoad, IconLoad } from './styles';
+
+import Filter from '../Components/Filter';
+import { Card } from '../Components/Card';
 
 const Trending = () => {
   const dispatch = useDispatch();
-  const {trending, trendingPage} = useSelector((state) => state);
-  const [isLoad, setIsLoad] = useState(false);
+  const { trending, trendingPage, filters } = useSelector(state => state);
 
   useEffect(() => {
-    loadRepositories();
+    if (trending.length === 0) {
+      loadRepositories();
+    }
   }, [loadRepositories]);
 
   const loadRepositories = useCallback(async () => {
-    if (isLoad) {
-      return;
-    }
-    setIsLoad(true);
     (async () => {
-      const {data} = await api.get(`movies/trending?page=${trendingPage}`);
+      const { data } = await api.get(`movies/trending?page=${trendingPage}`);
       trending.push(...data);
       await Promise.all(
-        data.map(async (item) => {
+        data.map(async item => {
           try {
             const infos = await apiFanart.get(
               `${item.movie.ids.tmdb}?api_key=023cb0942e00e8768646256b062d29d6`,
@@ -33,7 +32,9 @@ const Trending = () => {
             item.movie.movieposter = infos.data.movieposter
               ? infos.data.movieposter[0]
               : null;
-          } catch (e) {}
+          } catch (e) {
+            item.movie.movieposter = null;
+          }
         }),
       );
       dispatch({
@@ -42,45 +43,35 @@ const Trending = () => {
         page: trendingPage + 1,
       });
     })();
-    setIsLoad(false);
-  }, [dispatch, isLoad, trending, trendingPage]);
+  }, [dispatch, trending, trendingPage]);
 
-  const renderItem = ({item, index}) => {
-    return <Card index={index} item={item.movie} />;
-  };
-
-  const renderFooter = () => {
-    if (isLoad) {
-      return null;
-    }
-    return (
-      <ViewLoad>
-        <IconLoad />
-      </ViewLoad>
-    );
-  };
+  const renderItem = ({ item, index }) => (
+    <Card index={index} item={item.movie} />
+  );
 
   return (
-    <SafeAreaView>
-      {trending !== null && (
-        <FlatList
-          initialNumToRender={10}
-          data={trending}
-          renderItem={renderItem}
-          keyExtractor={(item) =>
-            `${item.movie.ids.imdb}${Math.random().toString(36).substring(7)}`
-          }
-          onEndReached={() => loadRepositories()}
-          onEndReachedThreshold={0.0}
-          ListFooterComponent={() => renderFooter()}
-          // Performance
-          removeClippedSubviews={true}
-          maxToRenderPerBatch={1}
-          updateCellsBatchingPeriod={100}
-          windowSize={7}
-        />
-      )}
-    </SafeAreaView>
+    <>
+      <Filter options={filters} />
+      <SafeAreaView>
+        {trending !== null && (
+          <FlatList
+            initialNumToRender={10}
+            data={trending}
+            renderItem={renderItem}
+            keyExtractor={item =>
+              `${item.movie.ids.imdb}${Math.random().toString(36).substring(7)}`
+            }
+            onEndReached={() => loadRepositories()}
+            onEndReachedThreshold={0.1}
+            // Performance
+            removeClippedSubviews
+            maxToRenderPerBatch={1}
+            updateCellsBatchingPeriod={100}
+            windowSize={7}
+          />
+        )}
+      </SafeAreaView>
+    </>
   );
 };
 
