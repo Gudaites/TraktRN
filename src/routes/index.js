@@ -56,8 +56,8 @@ const Routes = () => {
           inactiveTintColor: 'grey',
         }}
       >
-        <App.Screen name="Trending" component={Trending} />
         <App.Screen name="Popular" component={Popular} />
+        <App.Screen name="Trending" component={Trending} />
       </App.Navigator>
     </NavigationContainer>
   );

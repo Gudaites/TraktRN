@@ -26,8 +26,9 @@ export const ActionButton = styled.TouchableOpacity`
   align-items: center;
   justify-content: center;
   border-radius: 5px;
+
   border: 1px solid #f0a500;
-  background-color: #333;
+  background-color: ${props => (props.isActive ? '#999' : '#333')};
   padding: 11px;
   margin-bottom: 15px;
 `;

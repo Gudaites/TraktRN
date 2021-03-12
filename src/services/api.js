@@ -10,6 +10,6 @@ export const api = axios.create({
   },
 });
 
-export const apiFanart = axios.create({
+export const apiTMDB = axios.create({
   baseURL: 'https://api.themoviedb.org/3/movie/',
 });

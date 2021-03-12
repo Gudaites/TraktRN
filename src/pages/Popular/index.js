@@ -3,20 +3,30 @@ import React, { useEffect, useState, useCallback } from 'react';
 // React Redux
 import { useSelector, useDispatch } from 'react-redux';
 
-import { api, apiFanart } from '../../services/api';
-import { SafeAreaView, FlatList, ViewLoad, IconLoad } from './styles';
-import Card from '../Components/Card';
+import { api, apiTMDB } from '../../services/api';
+import {
+  SafeAreaView,
+  FlatList,
+  ViewLoad,
+  IconLoad,
+  HeaderView,
+  HeaderText,
+} from './styles';
+import { Card } from '../Components/Card';
+import Filter from '../Components/Filter';
 
 const Popular = () => {
   const dispatch = useDispatch();
-  const { popular, popularPage } = useSelector(state => state);
+  const { popular, popularPage, filters, popularFilter } = useSelector(
+    state => state,
+  );
   const [isLoad, setIsLoad] = useState(false);
 
   useEffect(() => {
     if (popular.length === 0) {
       loadRepositories();
     }
-  }, [loadRepositories]);
+  }, [loadRepositories, popularFilter]);
 
   const loadRepositories = useCallback(async () => {
     if (isLoad) {
@@ -24,19 +34,20 @@ const Popular = () => {
     }
     setIsLoad(true);
     (async () => {
-      const { data } = await api.get(`movies/popular?page=${popularPage}`);
+      const { data } = await api.get(`movies/popular?page=${popularPage}
+      ${popularFilter !== null ? `&genres=${popularFilter}` : ''}`);
       popular.push(...data);
       await Promise.all(
         data.map(async item => {
-          try {
-            const infos = await apiFanart.get(
-              `${item.ids.tmdb}?api_key=023cb0942e00e8768646256b062d29d6`,
-            );
-            item.movieposter = infos.data.movieposter
-              ? infos.data.movieposter[0]
-              : null;
-          } catch (e) {
-          }
+          const info = await apiTMDB.get(
+            `${item.ids.tmdb}?api_key=f98a0ebf05f1ea85544a78f3bc54fde2`,
+          );
+          item.movieInfo = {
+            resume: info.data.overview,
+            title: info.data.original_title,
+            poster: info.data.poster_path,
+            status: info.data.status,
+          };
         }),
       );
       dispatch({
@@ -48,11 +59,25 @@ const Popular = () => {
     setIsLoad(false);
   }, [dispatch, isLoad, popular, popularPage]);
 
+  const filterChange = async filter => {
+    dispatch({
+      type: 'SET_POUPULAR_FILTER',
+      payload: filter,
+      page: 1,
+    });
+  };
+
   const renderItem = ({ item, index }) => <Card index={index} item={item} />;
+
+  const renderHeader = () => (
+    <HeaderView>
+      <HeaderText>Popular Movies</HeaderText>
+    </HeaderView>
+  );
 
   const renderFooter = () => {
     if (isLoad) {
-      return null;
+      <ViewLoad />;
     }
     return (
       <ViewLoad>
@@ -62,26 +87,34 @@ const Popular = () => {
   };
 
   return (
-    <SafeAreaView>
-      {popular !== null && (
-        <FlatList
-          initialNumToRender={10}
-          data={popular}
-          renderItem={renderItem}
-          keyExtractor={item =>
-            `${item.ids.imdb}${Math.random().toString(36).substring(7)}`
-          }
-          onEndReached={() => loadRepositories()}
-          onEndReachedThreshold={0.1}
-          ListFooterComponent={() => renderFooter()}
-          // Performance
-          removeClippedSubviews
-          maxToRenderPerBatch={1}
-          updateCellsBatchingPeriod={100}
-          windowSize={7}
-        />
-      )}
-    </SafeAreaView>
+    <>
+      <Filter
+        options={filters}
+        setFilter={filterChange}
+        filter={popularFilter}
+      />
+      <SafeAreaView>
+        {popular !== null && (
+          <FlatList
+            initialNumToRender={10}
+            data={popular}
+            renderItem={renderItem}
+            keyExtractor={item =>
+              `${item.ids.imdb}${Math.random().toString(36).substring(7)}`
+            }
+            onEndReached={() => loadRepositories()}
+            onEndReachedThreshold={0.1}
+            ListHeaderComponent={() => renderHeader()}
+            ListFooterComponent={() => renderFooter()}
+            // Performance
+            removeClippedSubviews
+            maxToRenderPerBatch={1}
+            updateCellsBatchingPeriod={100}
+            windowSize={7}
+          />
+        )}
+      </SafeAreaView>
+    </>
   );
 };
 

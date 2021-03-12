@@ -6,12 +6,12 @@ import { Container } from './styles';
 
 Feather.loadFont();
 
-const Filter = ({ options, setFilter }) => {
+const Filter = ({ options, setFilter, filter }) => {
   const [isActionMenuOpened, setIsActionMenuOpened] = useState(false);
   return (
     <>
       {isActionMenuOpened && (
-        <ActionMenu options={options} setFilter={setFilter} />
+        <ActionMenu options={options} setFilter={setFilter} filter={filter} />
       )}
       <Container
         activeOpacity={0.8}

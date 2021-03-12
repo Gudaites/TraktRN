@@ -1,17 +1,24 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 
 // React Redux
 import { useSelector, useDispatch } from 'react-redux';
 
-import { api, apiFanart } from '../../services/api';
-import { SafeAreaView, FlatList, ViewLoad, IconLoad } from './styles';
+import { api, apiTMDB } from '../../services/api';
+import {
+  SafeAreaView,
+  FlatList,
+  ViewLoad,
+  IconLoad,
+  HeaderView,
+  HeaderText,
+} from './styles';
 
-import Filter from '../Components/Filter';
 import { Card } from '../Components/Card';
 
 const Trending = () => {
   const dispatch = useDispatch();
   const { trending, trendingPage } = useSelector(state => state);
+  const [isLoad, setIsLoad] = useState(false);
 
   useEffect(() => {
     if (trending.length === 0) {
@@ -20,12 +27,17 @@ const Trending = () => {
   }, [loadRepositories]);
 
   const loadRepositories = useCallback(async () => {
+    if (isLoad) {
+      return;
+    }
+
     (async () => {
+      setIsLoad(true);
       const { data } = await api.get(`movies/trending?page=${trendingPage}`);
       trending.push(...data);
       await Promise.all(
         data.map(async item => {
-          const info = await apiFanart.get(
+          const info = await apiTMDB.get(
             `${item.movie.ids.tmdb}?api_key=f98a0ebf05f1ea85544a78f3bc54fde2`,
           );
           item.movie.movieInfo = {
@@ -36,6 +48,7 @@ const Trending = () => {
           };
         }),
       );
+      setIsLoad(false);
       dispatch({
         type: 'SET_TRENDING',
         payload: trending,
@@ -44,21 +57,29 @@ const Trending = () => {
     })();
   }, [dispatch, trending, trendingPage]);
 
-  const filterChange = async filter => {
-    dispatch({
-      type: 'SET_TRENDING_FILTER',
-      payload: filter,
-      page: 1,
-    });
-  };
-
   const renderItem = ({ item, index }) => (
     <Card index={index} item={item.movie} />
   );
 
+  const renderFooter = () => {
+    if (isLoad === false) {
+      return <ViewLoad />;
+    }
+    return (
+      <ViewLoad>
+        <IconLoad />
+      </ViewLoad>
+    );
+  };
+
+  const renderHeader = () => (
+    <HeaderView>
+      <HeaderText>Top Trending</HeaderText>
+    </HeaderView>
+  );
+
   return (
     <>
-      {/* <Filter options={filters} setFilter={filterChange} /> */}
       <SafeAreaView>
         {trending !== null && (
           <FlatList
@@ -70,6 +91,8 @@ const Trending = () => {
             }
             onEndReached={() => loadRepositories()}
             onEndReachedThreshold={0.1}
+            ListHeaderComponent={() => renderHeader()}
+            ListFooterComponent={() => renderFooter()}
             // Performance
             removeClippedSubviews
             maxToRenderPerBatch={1}
