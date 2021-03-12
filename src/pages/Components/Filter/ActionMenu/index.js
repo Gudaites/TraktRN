@@ -10,6 +10,7 @@ const ActionMenu = ({ options, setFilter }) => (
       <View>
         {options.map(item => (
           <ActionButton
+            key={item.name}
             activeOpacity={0.8}
             onPress={() => setFilter(item.slug)}
           >

@@ -11,5 +11,5 @@ export const api = axios.create({
 });
 
 export const apiFanart = axios.create({
-  baseURL: 'https://webservice.fanart.tv/v3/movies/',
+  baseURL: 'https://api.themoviedb.org/3/movie/',
 });

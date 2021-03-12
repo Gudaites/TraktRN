@@ -5,7 +5,7 @@ export const Container = styled.View`
   width: 100%;
   flex: 1;
   flex-direction: row;
-  align-items: center;
+  /* align-items: center; */
 `;
 
 export const CardContent = styled.View`
@@ -32,10 +32,11 @@ export const Border = styled(FastImage)`
 `;
 
 export const InfoView = styled.View`
+  padding: 10px;
   flex: 1;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: space-around;
 `;
 
 export const Title = styled.Text`
@@ -47,4 +48,26 @@ export const Title = styled.Text`
 export const Year = styled.Text`
   color: white;
   font-size: 12px;
+`;
+
+export const Info = styled.TouchableOpacity`
+  border-radius: 4px;
+  background-color: #333;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #f0a500;
+`;
+
+export const More = styled.Text`
+  color: white;
+  font-size: 12px;
+  margin: 10px;
+`;
+
+export const Line = styled.View`
+  height: 1px;
+  background-color: #7777;
+  width: auto;
+  margin-left: 10px;
+  margin-right: 10px;
 `;

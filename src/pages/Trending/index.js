@@ -11,7 +11,7 @@ import { Card } from '../Components/Card';
 
 const Trending = () => {
   const dispatch = useDispatch();
-  const { trending, trendingPage, filters } = useSelector(state => state);
+  const { trending, trendingPage } = useSelector(state => state);
 
   useEffect(() => {
     if (trending.length === 0) {
@@ -25,16 +25,15 @@ const Trending = () => {
       trending.push(...data);
       await Promise.all(
         data.map(async item => {
-          try {
-            const infos = await apiFanart.get(
-              `${item.movie.ids.tmdb}?api_key=023cb0942e00e8768646256b062d29d6`,
-            );
-            item.movie.movieposter = infos.data.movieposter
-              ? infos.data.movieposter[0]
-              : null;
-          } catch (e) {
-            item.movie.movieposter = null;
-          }
+          const info = await apiFanart.get(
+            `${item.movie.ids.tmdb}?api_key=f98a0ebf05f1ea85544a78f3bc54fde2`,
+          );
+          item.movie.movieInfo = {
+            resume: info.data.overview,
+            title: info.data.original_title,
+            poster: info.data.poster_path,
+            status: info.data.status,
+          };
         }),
       );
       dispatch({
@@ -45,13 +44,21 @@ const Trending = () => {
     })();
   }, [dispatch, trending, trendingPage]);
 
+  const filterChange = async filter => {
+    dispatch({
+      type: 'SET_TRENDING_FILTER',
+      payload: filter,
+      page: 1,
+    });
+  };
+
   const renderItem = ({ item, index }) => (
     <Card index={index} item={item.movie} />
   );
 
   return (
     <>
-      <Filter options={filters} />
+      {/* <Filter options={filters} setFilter={filterChange} /> */}
       <SafeAreaView>
         {trending !== null && (
           <FlatList

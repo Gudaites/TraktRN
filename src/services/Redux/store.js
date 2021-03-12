@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 function setTrending(movies, page) {
   const action = {
     type: 'SET_TRENDING',
@@ -7,9 +8,18 @@ function setTrending(movies, page) {
   return action;
 }
 
-function setWatched(movies, page) {
+function setPopular(movies, page) {
   const action = {
     type: 'SET_POPULAR',
+    payload: new Promise(movies),
+    page: new Promise(page),
+  };
+  return action;
+}
+
+function setPopularFilter(movies, page) {
+  const action = {
+    type: 'SET_POPULAR_FILTER',
     payload: new Promise(movies),
     page: new Promise(page),
   };
@@ -19,14 +29,6 @@ function setWatched(movies, page) {
 function setFilter(movies) {
   const action = {
     type: 'SET_FILTER',
-    payload: new Promise(movies),
-  };
-  return action;
-}
-
-function setAnticipated(movies) {
-  const action = {
-    type: 'SET_ANTICIPATED',
     payload: new Promise(movies),
   };
   return action;
@@ -44,12 +46,12 @@ function setMovies(movies, type) {
   switch (type) {
     case 'trending':
       return setTrending(movies);
+    case 'filter':
+      return setFilter(movies);
     case 'popular':
-      return setWatched(movies);
-    case 'boxoffice':
-      return setBoxOffice(movies);
-    case 'anticipated':
-      return setAnticipated(movies);
+      return setPopular(movies);
+    case 'popularFilter':
+      return setPopularFilter(movies);
     default:
       break;
   }
