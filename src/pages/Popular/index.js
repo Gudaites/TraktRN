@@ -3,7 +3,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 // React Redux
 import { useSelector, useDispatch } from 'react-redux';
 
-import { api, apiTMDB } from '../../services/api';
 import {
   SafeAreaView,
   FlatList,
@@ -14,6 +13,7 @@ import {
 } from './styles';
 import { Card } from '../Components/Card';
 import Filter from '../Components/Filter';
+import { moviesPopular } from '../../utils/Movies';
 
 const Popular = () => {
   const dispatch = useDispatch();
@@ -33,30 +33,13 @@ const Popular = () => {
       return;
     }
     setIsLoad(true);
-    (async () => {
-      const { data } = await api.get(`movies/popular?page=${popularPage}
-      ${popularFilter !== null ? `&genres=${popularFilter}` : ''}`);
-      popular.push(...data);
-      await Promise.all(
-        data.map(async item => {
-          const info = await apiTMDB.get(
-            `${item.ids.tmdb}?api_key=f98a0ebf05f1ea85544a78f3bc54fde2`,
-          );
-          item.movieInfo = {
-            resume: info.data.overview,
-            title: info.data.original_title,
-            poster: info.data.poster_path,
-            status: info.data.status,
-          };
-        }),
-      );
-      dispatch({
-        type: 'SET_POPULAR',
-        payload: popular,
-        page: popularPage + 1,
-      });
-    })();
+    const { result } = await moviesPopular(popular, popularFilter, popularPage);
     setIsLoad(false);
+    dispatch({
+      type: 'SET_POPULAR',
+      payload: result,
+      page: popularPage + 1,
+    });
   }, [dispatch, isLoad, popular, popularPage]);
 
   const filterChange = async filter => {

@@ -3,7 +3,6 @@ import React, { useEffect, useCallback, useState } from 'react';
 // React Redux
 import { useSelector, useDispatch } from 'react-redux';
 
-import { api, apiTMDB } from '../../services/api';
 import {
   SafeAreaView,
   FlatList,
@@ -14,6 +13,7 @@ import {
 } from './styles';
 
 import { Card } from '../Components/Card';
+import { moviesTrending } from '../../utils/Movies';
 
 const Trending = () => {
   const dispatch = useDispatch();
@@ -30,31 +30,14 @@ const Trending = () => {
     if (isLoad) {
       return;
     }
-
-    (async () => {
-      setIsLoad(true);
-      const { data } = await api.get(`movies/trending?page=${trendingPage}`);
-      trending.push(...data);
-      await Promise.all(
-        data.map(async item => {
-          const info = await apiTMDB.get(
-            `${item.movie.ids.tmdb}?api_key=f98a0ebf05f1ea85544a78f3bc54fde2`,
-          );
-          item.movie.movieInfo = {
-            resume: info.data.overview,
-            title: info.data.original_title,
-            poster: info.data.poster_path,
-            status: info.data.status,
-          };
-        }),
-      );
-      setIsLoad(false);
-      dispatch({
-        type: 'SET_TRENDING',
-        payload: trending,
-        page: trendingPage + 1,
-      });
-    })();
+    setIsLoad(true);
+    const { result } = await moviesTrending(trending, trendingPage);
+    setIsLoad(false);
+    dispatch({
+      type: 'SET_TRENDING',
+      payload: result,
+      page: trendingPage + 1,
+    });
   }, [dispatch, trending, trendingPage]);
 
   const renderItem = ({ item, index }) => (

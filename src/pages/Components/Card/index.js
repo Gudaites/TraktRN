@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import FastImage from 'react-native-fast-image';
+import { Text } from 'react-native';
 
 import {
   Container,
@@ -20,13 +21,15 @@ export const Card = ({ index, item }) => {
   const poster = item.movieInfo ? item.movieInfo.poster : null;
   return (
     <>
-      <Modal
-        open={modal}
-        title={item.movieInfo ? item.movieInfo.title : null}
-        resume={item.movieInfo ? item.movieInfo.resume : null}
-        poster={`https://image.tmdb.org/t/p/w500${poster}`}
-        setModal={setModal}
-      />
+      {modal && (
+        <Modal
+          open={modal}
+          title={item.movieInfo ? item.movieInfo.title : null}
+          resume={item.movieInfo ? item.movieInfo.resume : null}
+          poster={`https://image.tmdb.org/t/p/w500${poster}`}
+          setModal={setModal}
+        />
+      )}
       <Container key={index}>
         <CardContent>
           <Image
@@ -42,11 +45,14 @@ export const Card = ({ index, item }) => {
           />
         </CardContent>
         <InfoView>
-          <Title>Top {index + 1}º</Title>
-          <Title>{item.title}</Title>
-          <Year>{item.year}</Year>
-          <Info onPress={() => setModal(true)}>
+          <Title testID="top">Top {index + 1}º</Title>
+          <Title testID="title">{item.title}</Title>
+          <Year testID="year">{item.year}</Year>
+          <Info testID="button" onPress={() => setModal(true)}>
             <More>Information</More>
+            <Text testID="modal" style={{ opacity: 0, height: 0 }}>
+              {modal}
+            </Text>
           </Info>
         </InfoView>
       </Container>

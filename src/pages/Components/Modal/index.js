@@ -1,6 +1,5 @@
 import React from 'react';
 import FastImage from 'react-native-fast-image';
-import { Alert } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 
 import {
@@ -9,7 +8,6 @@ import {
   View,
   CardContent,
   Image,
-  Border,
   Title,
   Resume,
   ResumeText,
@@ -19,25 +17,16 @@ import {
 Feather.loadFont();
 
 export const Card = ({ open, resume, title, poster, setModal }) => (
-  <Modal
-    visible={open}
-    animationType="slide"
-    r
-    transparent
-    onRequestClose={() => {
-      Alert.alert('Modal has been closed.');
-    }}
-  >
+  <Modal visible={open} animationType="slide" transparent>
     <SafeAreaView>
       <CardContent>
-        <ButtonView onPress={() => setModal(false)}>
-          <Feather name="x" size={22} color="#f0a500" />
+        <ButtonView testID="button-close" onPress={() => setModal(false)}>
+          <Feather testID="testIcon" name="x" size={22} color="#f0a500" />
         </ButtonView>
         <View>
-          <Title>{title}</Title>
+          <Title testID="title-modal">{title}</Title>
           <Image
             resizeMode={FastImage.resizeMode.stretch}
-            imageStyle={Border}
             source={{
               uri:
                 poster !== undefined
@@ -46,8 +35,8 @@ export const Card = ({ open, resume, title, poster, setModal }) => (
               priority: FastImage.priority.high,
             }}
           />
-          <Resume>Resume</Resume>
-          <ResumeText>{resume}</ResumeText>
+          <Resume testID="resume-modal">Resume</Resume>
+          <ResumeText testID="resume-text-modal">{resume}</ResumeText>
         </View>
       </CardContent>
     </SafeAreaView>
